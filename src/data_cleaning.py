@@ -9,26 +9,26 @@ df = pd.read_csv(raw_path)
 
 # Column names are converted to both undercase and spaced with underscores for coding consistency
 
-df.columns = (
-    df.columns.str.strip()        
-             .str.lower()
-             .str.replace(" ", "_")
-)
+def clean_column_names(df):
+    df.columns = (
+        df.columns.str.strip()
+                 .str.lower()
+                 .str.replace(" ", "_")
+    )
+    return df
 
-# Remove unecessary spaces from certain fields that may create erros
+# Remove unecessary spaces from certain fields that may create errors, Rows with missing data to be dropped for consistency
 
-field_check = ["prodname", "category"]
-for cols in field_check:
-    if cols in df.columns:
-        df[cols] = df[cols].astype(str).str.strip()
+def remove_invalid_rows(df):
+    df = df.dropna(subset=["price", "qty"])
+    df = df[(df["price"] >= 0) & (df["qty"] >= 0)]
+    return df
 
-# Rows with missing data to be dropped for consistency
+# Utilize existing functions
 
-df = df.dropna(subset=["price", "qty"])
+df = clean_column_names(df)
 
-# Rows with impossible data pulled, in order to avoid nonsencical negative values
-
-df = df[(df["price"] >= 0) & (df["qty"] >= 0)]
+df = remove_invalid_rows(df)
 
 # Cleaned data is pushed to a csv file
 
