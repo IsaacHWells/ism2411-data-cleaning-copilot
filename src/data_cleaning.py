@@ -25,3 +25,12 @@ for cols in field_check:
 # Rows with missing data to be dropped for consistency
 
 df = df.dropna(subset=["price", "qty"])
+
+# Rows with impossible data pulled, in order to avoid nonsencical negative values
+
+df = df[(df["price"] >= 0) & (df["qty"] >= 0)]
+
+# Cleaned data is pushed to a csv file
+
+output_path = "data/processed/sales_data_clean.csv"
+df.to_csv(output_path, index=False)
